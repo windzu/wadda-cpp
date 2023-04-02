@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="lidar_tools" type="merge_pc" name="merge_pc" output="screen">
+        <rosparam file="$(find lidar_tools)/cfgs/calib.yaml" command="load" />
+    </node>
+</launch>

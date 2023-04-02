@@ -1,0 +1,11 @@
+topic_list:
+  - "/lidar_points/front"
+  - "/lidar_points/left"
+  - "/lidar_points/right"
+  - "/lidar_points/top"
+
+# 顺序: x,y,z,roll,pitch,yaw
+lidar_front_calib: [0.3085,-0.01,1.47706366,-0.008704,0.113270693,-0.04499]
+lidar_left_calib: [0.31,-0.02,1.43235302,-0.0566349179,-0.00957309362,-0.08500]
+lidar_right_calib: [0.20349,0.004000,1.4097,0.04825,-0.0100156,-0.0700]
+lidar_top_calib: [0.2885,0.0,1.4,0.008,0.003,-1.562]
