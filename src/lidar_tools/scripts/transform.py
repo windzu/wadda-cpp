@@ -2,7 +2,7 @@
 Author: windzu windzu1@gmail.com
 Date: 2023-04-01 17:11:33
 LastEditors: windzu windzu1@gmail.com
-LastEditTime: 2023-04-03 10:23:17
+LastEditTime: 2023-04-03 17:17:15
 Description: 
 Copyright (c) 2023 by windzu, All Rights Reserved. 
 '''
@@ -61,8 +61,19 @@ def write_bag(calib_dict, input_bag, output_bag):
                 # convert cloud to PointCloud2
                 header = Header()
                 header.stamp = t
+
+                # debug
+                print("header.stamp: ", header.stamp)
+
+                # header.stamp = t
                 header.frame_id = "base_link"
-                cloud_msg = pc2.create_cloud_xyz32(header, cloud)
+                fields = [
+                    PointField('x', 0, PointField.FLOAT32, 1),
+                    PointField('y', 4, PointField.FLOAT32, 1),
+                    PointField('z', 8, PointField.FLOAT32, 1),
+                    PointField('intensity', 12, PointField.FLOAT32, 1)
+                ]
+                cloud_msg = pc2.create_cloud(header, fields, cloud)
                 outbag.write(cur_topic, cloud_msg, t)
             else:
                 outbag.write(cur_topic, msg, t)
@@ -70,15 +81,18 @@ def write_bag(calib_dict, input_bag, output_bag):
 
 def transform_cloud(cloud_msg, transform_mat):
     # convert PointCloud2 to numpy array
-    cloud = pc2.read_points(
-        cloud_msg, skip_nans=True, field_names=("x", "y", "z"))
-    cloud = np.array(list(cloud))
-    cloud = np.hstack((cloud, np.ones((cloud.shape[0], 1))))
+    raw_cloud = pc2.read_points(
+        cloud_msg, skip_nans=True, field_names=("x", "y", "z", "intensity"))
+    raw_cloud = np.array(list(raw_cloud))
 
+    cloud = np.hstack((raw_cloud[:, :3], np.ones((raw_cloud.shape[0], 1))))
     cloud = np.dot(transform_mat, cloud.T).T
 
-    # convert cloud to 3dim
+    # remove the last column
     cloud = cloud[:, :3]
+
+    # add intensity
+    cloud = np.hstack((cloud, raw_cloud[:, 3:]))
     return cloud
 
 
