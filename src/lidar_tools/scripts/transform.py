@@ -2,7 +2,7 @@
 Author: windzu windzu1@gmail.com
 Date: 2023-04-01 17:11:33
 LastEditors: windzu windzu1@gmail.com
-LastEditTime: 2023-04-03 17:17:15
+LastEditTime: 2023-04-10 19:12:22
 Description: 
 Copyright (c) 2023 by windzu, All Rights Reserved. 
 '''
@@ -62,9 +62,6 @@ def write_bag(calib_dict, input_bag, output_bag):
                 header = Header()
                 header.stamp = t
 
-                # debug
-                print("header.stamp: ", header.stamp)
-
                 # header.stamp = t
                 header.frame_id = "base_link"
                 fields = [
@@ -84,6 +81,9 @@ def transform_cloud(cloud_msg, transform_mat):
     raw_cloud = pc2.read_points(
         cloud_msg, skip_nans=True, field_names=("x", "y", "z", "intensity"))
     raw_cloud = np.array(list(raw_cloud))
+
+    # remove nan
+    raw_cloud = raw_cloud[~np.isnan(raw_cloud).any(axis=1)]
 
     cloud = np.hstack((raw_cloud[:, :3], np.ones((raw_cloud.shape[0], 1))))
     cloud = np.dot(transform_mat, cloud.T).T
